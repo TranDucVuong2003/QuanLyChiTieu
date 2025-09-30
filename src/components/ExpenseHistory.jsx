@@ -2,7 +2,10 @@ import React from 'react';
 
 const ExpenseHistory = ({ expenses, onDeleteExpense }) => {
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN').format(amount) + ' VNĐ';
+    return new Intl.NumberFormat('vi-VN', {
+      maximumFractionDigits: 0,
+      minimumFractionDigits: 0
+    }).format(Math.round(amount)) + ' VNĐ';
   };
 
   if (expenses.length === 0) {

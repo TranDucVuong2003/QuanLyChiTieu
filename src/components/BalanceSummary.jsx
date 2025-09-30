@@ -40,7 +40,10 @@ const BalanceSummary = ({ expenses }) => {
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN').format(Math.abs(amount)) + ' VNĐ';
+    return new Intl.NumberFormat('vi-VN', {
+      maximumFractionDigits: 0,
+      minimumFractionDigits: 0
+    }).format(Math.abs(Math.round(amount))) + ' VNĐ';
   };
 
   const getBalanceColor = (balance) => {
