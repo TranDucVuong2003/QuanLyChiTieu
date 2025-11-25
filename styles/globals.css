@@ -1,75 +1,185 @@
 @import "tailwindcss";
 
-/* Custom styles */
-::-webkit-scrollbar {
-  width: 6px;
+/* ========================================
+   Custom SweetAlert2 Styling - Fixed Mobile Icon
+   ======================================== */
+
+/* ========== Modal Popup ========== */
+.swal2-popup {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+  border-radius: 1rem !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  padding: 2rem !important;
+  max-width: 90vw !important;
+  background: #ffffff !important;
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
+.swal2-popup.swal2-show {
+  animation: slideInDown 0.3s ease-out !important;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+@keyframes slideInDown {
+  from { opacity: 0; transform: translate3d(0, -20px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+/* ========== Title ========== */
+.swal2-title {
+  font-weight: 600 !important;
+  font-size: 1.5rem !important;
+  color: #111827 !important;
+  margin-bottom: 1rem !important;
+  line-height: 1.4 !important;
+  padding: 0 !important;
 }
 
-/* Smooth transitions for all elements */
-* {
-  transition: all 0.2s ease-in-out;
+/* ========== HTML Content ========== */
+.swal2-html-container {
+  color: #6b7280 !important;
+  font-size: 1rem !important;
+  line-height: 1.625 !important;
+  margin: 0 0 1.5rem 0 !important;
+  text-align: center !important;
 }
 
-/* Mobile responsiveness improvements */
-@media (max-width: 768px) {
-  .container {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  
-  /* Make table more mobile friendly */
-  .table-mobile th,
-  .table-mobile td {
-    padding: 0.5rem 0.25rem;
-    font-size: 0.875rem;
-  }
-  
-  /* Stack grid items on mobile */
-  .grid-cols-1.lg\:grid-cols-2 {
-    grid-template-columns: 1fr;
-  }
-  
-  .grid-cols-1.md\:grid-cols-3 {
-    grid-template-columns: 1fr;
-  }
+/* ========== Icons ========== */
+.swal2-icon {
+  margin: 0 auto 1.5rem auto !important;
+  width: 5rem !important;
+  height: 5rem !important;
+  border-width: 4px !important;
+  /* Đảm bảo box-sizing chuẩn để không bị lệch nét */
+  box-sizing: content-box !important; 
 }
 
-/* Animation for new expenses */
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Success Icon */
+.swal2-icon.swal2-success { border-color: #10b981 !important; }
+.swal2-icon.swal2-success [class^='swal2-success-line'] { background-color: #10b981 !important; }
+.swal2-icon.swal2-success .swal2-success-ring { border-color: rgba(16, 185, 129, 0.3) !important; }
+
+/* Error Icon */
+.swal2-icon.swal2-error { border-color: #ef4444 !important; }
+.swal2-icon.swal2-error [class^='swal2-x-mark-line'] { background-color: #ef4444 !important; }
+
+/* Warning Icon */
+.swal2-icon.swal2-warning { border-color: #f59e0b !important; color: #f59e0b !important; }
+.swal2-icon.swal2-warning .swal2-icon-content { color: #f59e0b !important; }
+
+/* Info Icon */
+.swal2-icon.swal2-info { border-color: #3b82f6 !important; color: #3b82f6 !important; }
+
+/* Question Icon */
+.swal2-icon.swal2-question { border-color: #8b5cf6 !important; color: #8b5cf6 !important; }
+
+/* ========== Buttons ========== */
+.swal2-actions {
+  margin: 1.5rem 0 0 0 !important;
+  gap: 0.75rem !important;
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
 }
 
-.expense-item {
-  animation: slideIn 0.3s ease-out;
+.swal2-confirm {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+  border: none !important;
+  border-radius: 0.5rem !important;
+  font-weight: 600 !important;
+  padding: 0.75rem 2rem !important;
+  font-size: 0.9375rem !important;
+  min-width: 6rem !important;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.2) !important;
+  color: white !important;
+  transition: transform 0.1s ease-in-out !important;
+}
+.swal2-confirm:active { transform: scale(0.97) !important; }
+
+.swal2-cancel {
+  background-color: #f3f4f6 !important;
+  color: #374151 !important;
+  border: none !important;
+  border-radius: 0.5rem !important;
+  font-weight: 600 !important;
+  padding: 0.75rem 2rem !important;
+  font-size: 0.9375rem !important;
+  min-width: 6rem !important;
+  transition: transform 0.1s ease-in-out !important;
+}
+.swal2-cancel:active { transform: scale(0.97) !important; }
+
+.swal2-popup.swal2-delete .swal2-confirm {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3), 0 2px 4px -1px rgba(239, 68, 68, 0.2) !important;
 }
 
-/* Responsive text sizes */
+/* ========== Toast ========== */
+.swal2-toast {
+  border-radius: 0.75rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+  padding: 0.75rem 1.25rem !important;
+  background: white !important;
+  display: flex !important;
+  align-items: center !important;
+}
+.swal2-toast.swal2-success-toast { border-left: 4px solid #10b981 !important; background-color: #f0fdf4 !important; }
+.swal2-toast.swal2-error-toast { border-left: 4px solid #ef4444 !important; background-color: #fef2f2 !important; }
+.swal2-toast.swal2-info-toast { border-left: 4px solid #3b82f6 !important; background-color: #eff6ff !important; }
+.swal2-toast.swal2-warning-toast { border-left: 4px solid #f59e0b !important; background-color: #fffbeb !important; }
+.swal2-toast .swal2-timer-progress-bar { display: none !important; }
+.swal2-toast .swal2-title { font-size: 0.9375rem !important; font-weight: 500 !important; color: #111827 !important; margin: 0 !important; }
+
+/* ========================================================
+   RESPONSIVE (MOBILE) - FIXED ICON & LAYOUT
+   ======================================================== */
 @media (max-width: 640px) {
-  h1 {
-    font-size: 2.25rem !important;
+  .swal2-popup {
+    width: 90vw !important;
+    padding: 1.5rem !important;
+    border-radius: 1.25rem !important;
   }
   
-  h2 {
-    font-size: 1.5rem !important;
+  .swal2-title { font-size: 1.25rem !important; }
+  
+  /* FIX QUAN TRỌNG CHO ICON MOBILE */
+  .swal2-icon {
+    /* Giữ nguyên size gốc (80px) để animation và nét vẽ không bị lệch */
+    width: 5rem !important; 
+    height: 5rem !important;
+    
+    /* Dùng scale để thu nhỏ hiển thị mắt nhìn thấy */
+    transform: scale(0.8) !important; 
+    
+    /* Điều chỉnh margin để bù lại khoảng trống do scale tạo ra */
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
   }
+  
+  .swal2-actions {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+  
+  .swal2-confirm, .swal2-cancel {
+    width: 100% !important;
+    padding: 0.875rem 1rem !important;
+    font-size: 1rem !important;
+  }
+  
+  .swal2-toast {
+    width: auto !important;
+    min-width: 300px !important;
+    max-width: 90vw !important;
+    margin: 1rem auto !important;
+    border-radius: 50px !important;
+    border-left: none !important;
+    justify-content: center !important;
+  }
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .swal2-popup { background-color: #1f2937 !important; }
+  .swal2-title { color: #f9fafb !important; }
+  .swal2-html-container { color: #d1d5db !important; }
+  .swal2-cancel { background-color: #374151 !important; color: #e5e7eb !important; }
 }

@@ -1,112 +1,260 @@
-import { useState, useEffect } from 'react'
-import Head from 'next/head'
-import ExpenseForm from '../src/components/ExpenseForm'
-import ExpenseHistory from '../src/components/ExpenseHistory'
-import BalanceSummary from '../src/components/BalanceSummary'
+import { useState, useEffect } from "react";
+import Head from "next/head";
+import ExpenseForm from "../src/components/ExpenseForm";
+import ExpenseHistory from "../src/components/ExpenseHistory";
+import BalanceSummary from "../src/components/BalanceSummary";
+import Swal from "sweetalert2";
 
 export default function Home() {
-  const [expenses, setExpenses] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const API_URL = '/api/expenses'
+  const API_URL = "/api/expenses";
 
   // Load expenses from API
   const loadExpenses = async () => {
     try {
-      setLoading(true)
-      const response = await fetch(API_URL)
+      setLoading(true);
+      const response = await fetch(API_URL);
       if (!response.ok) {
-        throw new Error('Không thể tải dữ liệu')
+        throw new Error("Không thể tải dữ liệu");
       }
-      const data = await response.json()
-      setExpenses(data)
-      setError(null)
+      const data = await response.json();
+      setExpenses(data);
+      setError(null);
     } catch (err) {
-      console.error('Load expenses error:', err)
-      setError(err.message)
+      console.error("Load expenses error:", err);
+      setError(err.message);
       // Fallback to localStorage if API fails
-      const savedExpenses = localStorage.getItem('roommate-expenses')
+      const savedExpenses = localStorage.getItem("roommate-expenses");
       if (savedExpenses) {
-        setExpenses(JSON.parse(savedExpenses))
+        setExpenses(JSON.parse(savedExpenses));
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Add expense
   const addExpense = async (expenseData) => {
+    // Xác nhận trước khi thêm
+    const confirmResult = await Swal.fire({
+      title: "ANH VƯƠNG CÓ ĐẸP TRAI KHÔNG?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#10b981",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Có ✨",
+      cancelButtonText: "Không",
+      allowOutsideClick: false,
+    });
+
+    if (!confirmResult.isConfirmed) {
+      Swal.fire({
+        icon: "error",
+        title: "Sai rồi!",
+        text: "Phải trả lời CÓ mới được thêm chi tiêu! 😤",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return false;
+    }
+
     try {
       const response = await fetch(API_URL, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(expenseData),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Không thể thêm chi tiêu')
+        throw new Error("Không thể thêm chi tiêu");
       }
 
-      const newExpense = await response.json()
-      setExpenses(prev => [newExpense, ...prev])
-      return true
+      const newExpense = await response.json();
+      setExpenses((prev) => [newExpense, ...prev]);
+
+      Swal.fire({
+        icon: "success",
+        title: "Thành công!",
+        text: "Đã thêm chi tiêu mới 🎉",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      return true;
     } catch (err) {
-      console.error('Add expense error:', err)
-      alert('Không thể thêm chi tiêu: ' + err.message)
-      return false
+      console.error("Add expense error:", err);
+
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi!",
+        text: "Không thể thêm chi tiêu: " + err.message,
+      });
+
+      return false;
     }
-  }
+  };
 
   // Delete expense
   const deleteExpense = async (id) => {
+    // Xác nhận trước khi xóa
+    const confirmResult = await Swal.fire({
+      title: "ANH VƯƠNG CÓ ĐẸP TRAI KHÔNG?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#10b981",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Có ✨",
+      cancelButtonText: "Không",
+      allowOutsideClick: false,
+    });
+
+    if (!confirmResult.isConfirmed) {
+      Swal.fire({
+        icon: "error",
+        title: "Sai rồi!",
+        text: "Phải trả lời CÓ mới được xóa! 😤",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: "Xác nhận xóa?",
+      text: "Bạn có chắc muốn xóa chi tiêu này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       const response = await fetch(`${API_URL}?id=${id}`, {
-        method: 'DELETE',
-      })
+        method: "DELETE",
+      });
 
       if (!response.ok) {
-        throw new Error('Không thể xóa chi tiêu')
+        throw new Error("Không thể xóa chi tiêu");
       }
 
-      setExpenses(prev => prev.filter(expense => expense.id !== id))
+      setExpenses((prev) => prev.filter((expense) => expense.id !== id));
+
+      Swal.fire({
+        icon: "success",
+        title: "Đã xóa!",
+        text: "Chi tiêu đã được xóa",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (err) {
-      console.error('Delete expense error:', err)
-      alert('Không thể xóa chi tiêu: ' + err.message)
+      console.error("Delete expense error:", err);
+
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi!",
+        text: "Không thể xóa chi tiêu: " + err.message,
+      });
     }
-  }
+  };
 
   // Clear all expenses
   const clearAllExpenses = async () => {
-    if (!confirm('Bạn có chắc chắn muốn xóa tất cả chi tiêu?')) {
-      return
+    // Xác nhận trước khi xóa tất cả
+    const confirmResult = await Swal.fire({
+      title: "ANH VƯƠNG CÓ ĐẸP TRAI KHÔNG?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#10b981",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Có ✨",
+      cancelButtonText: "Không",
+      allowOutsideClick: false,
+    });
+
+    if (!confirmResult.isConfirmed) {
+      Swal.fire({
+        icon: "error",
+        title: "Sai rồi!",
+        text: "Phải trả lời CÓ mới được xóa tất cả! 😤",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: "Cảnh báo!",
+      text: "Bạn có chắc chắn muốn xóa TẤT CẢ chi tiêu?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Xóa tất cả",
+      cancelButtonText: "Hủy",
+      input: "checkbox",
+      inputPlaceholder: "Tôi hiểu rằng hành động này không thể hoàn tác",
+    });
+
+    if (!result.isConfirmed || !result.value) {
+      if (result.isConfirmed && !result.value) {
+        Swal.fire({
+          icon: "info",
+          title: "Đã hủy",
+          text: "Vui lòng xác nhận để xóa",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
+      return;
     }
 
     try {
       const response = await fetch(`${API_URL}?id=all`, {
-        method: 'DELETE',
-      })
+        method: "DELETE",
+      });
 
       if (!response.ok) {
-        throw new Error('Không thể xóa dữ liệu')
+        throw new Error("Không thể xóa dữ liệu");
       }
 
-      setExpenses([])
+      setExpenses([]);
+
+      Swal.fire({
+        icon: "success",
+        title: "Đã xóa!",
+        text: "Tất cả chi tiêu đã được xóa",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (err) {
-      console.error('Clear all error:', err)
-      alert('Không thể xóa tất cả: ' + err.message)
+      console.error("Clear all error:", err);
+
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi!",
+        text: "Không thể xóa tất cả: " + err.message,
+      });
     }
-  }
+  };
 
   const exportData = () => {
     const dataStr = JSON.stringify(expenses, null, 2);
-    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = `chi-tieu-chung-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `chi-tieu-chung-${
+      new Date().toISOString().split("T")[0]
+    }.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -119,11 +267,14 @@ export default function Home() {
       reader.onload = (e) => {
         try {
           const importedExpenses = JSON.parse(e.target.result);
-          if (Array.isArray(importedExpenses) && window.confirm('Bạn có muốn thay thế dữ liệu hiện tại không?')) {
+          if (
+            Array.isArray(importedExpenses) &&
+            window.confirm("Bạn có muốn thay thế dữ liệu hiện tại không?")
+          ) {
             setExpenses(importedExpenses);
           }
         } catch {
-          alert('File không hợp lệ!');
+          alert("File không hợp lệ!");
         }
       };
       reader.readAsText(file);
@@ -131,19 +282,22 @@ export default function Home() {
   };
 
   useEffect(() => {
-    loadExpenses()
-  }, [])
+    loadExpenses();
+  }, []);
 
   // Auto backup to localStorage
   useEffect(() => {
-    localStorage.setItem('roommate-expenses', JSON.stringify(expenses))
-  }, [expenses])
+    localStorage.setItem("roommate-expenses", JSON.stringify(expenses));
+  }, [expenses]);
 
   return (
     <>
       <Head>
         <title>Quản Lý Chi Tiêu Chung - Trọ 3 Người</title>
-        <meta name="description" content="Ứng dụng chia tiền chi tiêu chung cho 3 người cùng trọ" />
+        <meta
+          name="description"
+          content="Ứng dụng chia tiền chi tiêu chung cho 3 người cùng trọ"
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -158,20 +312,30 @@ export default function Home() {
             <p className="text-gray-600 text-lg">
               Ứng dụng chia tiền thông minh cho 3 người cùng trọ
             </p>
-            
+
             {/* Connection Status */}
             <div className="mt-4 flex justify-center">
-              <button 
+              <button
                 onClick={loadExpenses}
                 className="flex items-center space-x-2 px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded-lg text-blue-700 text-sm font-medium transition-colors duration-200"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
                 </svg>
                 <span>🌐 Đồng bộ dữ liệu</span>
               </button>
             </div>
-            
+
             {error && (
               <div className="mt-4 p-4 bg-red-100 border border-red-300 rounded-lg text-red-700">
                 <p className="font-medium">⚠️ {error}</p>
@@ -187,65 +351,60 @@ export default function Home() {
             </div>
           ) : (
             <>
+              {/* Add Expense Form - Top Section */}
+              <ExpenseForm onAddExpense={addExpense} />
+
               {/* Balance Summary */}
               <BalanceSummary expenses={expenses} />
 
-              {/* Main Content Grid */}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                {/* Left Column: Form */}
-                <div className="xl:order-1 order-2">
-                  <ExpenseForm onAddExpense={addExpense} />
-                </div>
+              {/* Expense History */}
+              <ExpenseHistory
+                expenses={expenses}
+                onDeleteExpense={deleteExpense}
+              />
 
-                {/* Right Column: History */}
-                <div className="xl:order-2 order-1">
-                  <ExpenseHistory 
-                    expenses={expenses} 
-                    onDeleteExpense={deleteExpense} 
-                  />
-                  
-                  {/* Action Buttons */}
-                  {expenses.length > 0 && (
-                    <div className="mt-4 space-y-2">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <button
-                          onClick={exportData}
-                          className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200 text-sm font-medium"
-                        >
-                          📥 Xuất Dữ Liệu
-                        </button>
-                        
-                        <label className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 text-sm font-medium cursor-pointer text-center">
-                          📤 Nhập Dữ Liệu
-                          <input
-                            type="file"
-                            accept=".json"
-                            onChange={importData}
-                            className="hidden"
-                          />
-                        </label>
-                      </div>
-                      
-                      <button
-                        onClick={clearAllExpenses}
-                        className="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200 text-sm font-medium"
-                      >
-                        🗑️ Xóa Tất Cả Giao Dịch
-                      </button>
-                    </div>
-                  )}
+              {/* Action Buttons */}
+              {expenses.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button
+                      onClick={exportData}
+                      className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200 text-sm font-medium"
+                    >
+                      📥 Xuất Dữ Liệu
+                    </button>
+
+                    <label className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 text-sm font-medium cursor-pointer text-center">
+                      📤 Nhập Dữ Liệu
+                      <input
+                        type="file"
+                        accept=".json"
+                        onChange={importData}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+
+                  <button
+                    onClick={clearAllExpenses}
+                    className="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200 text-sm font-medium"
+                  >
+                    🗑️ Xóa Tất Cả Giao Dịch
+                  </button>
                 </div>
-              </div>
+              )}
             </>
           )}
 
           {/* Footer */}
           <footer className="mt-12 text-center text-gray-500 text-sm">
             <p>© 2025 - Ứng dụng quản lý chi tiêu chung cho người cùng trọ</p>
-            <p className="mt-1">🌐 Dữ liệu được đồng bộ qua Supabase • Chạy 24/7 trên Vercel</p>
+            <p className="mt-1">
+              🌐 Dữ liệu được đồng bộ qua Supabase • Chạy 24/7 trên Vercel
+            </p>
           </footer>
         </div>
       </div>
     </>
-  )
+  );
 }
