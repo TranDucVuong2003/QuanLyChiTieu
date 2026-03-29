@@ -1,14 +1,14 @@
 import React from 'react';
 
 const BalanceSummary = ({ expenses }) => {
-  const people = ['Trần Vương', 'Hào bé  o', 'Đăng H+ MP Poll'];
+  const people = ['Trần Vương', 'Hào bé  o', 'Đăng H+ MP Poll', 'Khánh'];
   
   const calculateBalances = () => {
     if (expenses.length === 0) {
       return people.map(person => ({ person, balance: 0, spent: 0 }));
     }
 
-    // Tính tổng chi tiêu của mỗi người
+    // Tính tổng chi tiêu của mỗi người (số tiền họ đã bỏ ra mua)
     const spentByPerson = people.reduce((acc, person) => {
       acc[person] = expenses
         .filter(expense => expense.person === person)
@@ -16,19 +16,34 @@ const BalanceSummary = ({ expenses }) => {
       return acc;
     }, {});
 
+    // Tính tổng số tiền mỗi người phải trả (dựa trên split_among)
+    const owedByPerson = people.reduce((acc, person) => {
+      acc[person] = 0;
+      return acc;
+    }, {});
+
+    expenses.forEach(expense => {
+      const splitList = expense.splitAmong || expense.split_among || people;
+      const sharePerPerson = expense.amount / splitList.length;
+      splitList.forEach(person => {
+        if (owedByPerson[person] !== undefined) {
+          owedByPerson[person] += sharePerPerson;
+        }
+      });
+    });
+
     // Tổng chi tiêu chung
     const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-    
-    // Mỗi người cần trả
-    const averagePerPerson = totalExpenses / 3;
 
-    // Tính balance cho mỗi người
+    // Tính balance cho mỗi người: đã chi - phải trả
     return people.map(person => {
       const spent = spentByPerson[person] || 0;
-      const balance = spent - averagePerPerson;
+      const owed = owedByPerson[person] || 0;
+      const balance = spent - owed;
       return {
         person,
         spent,
+        owed,
         balance,
         shouldPay: balance < 0 ? Math.abs(balance) : 0,
         shouldReceive: balance > 0 ? balance : 0
@@ -69,14 +84,12 @@ const BalanceSummary = ({ expenses }) => {
             {formatCurrency(totalExpenses)}
           </p>
           <p className="text-sm text-gray-600 mt-1">
-            Trung bình mỗi người: <span className="font-semibold">
-              {formatCurrency(totalExpenses / 3)}
-            </span>
+            {people.length} thành viên
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {balances.map(({ person, spent, balance, shouldPay, shouldReceive }) => (
           <div 
             key={person} 

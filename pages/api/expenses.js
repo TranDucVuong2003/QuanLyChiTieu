@@ -27,7 +27,8 @@ export default async function handler(req, res) {
           person: expense.person,
           description: expense.description,
           amount: parseFloat(expense.amount),
-          date: new Date(expense.created_at).toLocaleDateString('vi-VN')
+          date: new Date(expense.created_at).toLocaleDateString('vi-VN'),
+          splitAmong: expense.split_among || ['Trần Vương', 'Hào bé  o', 'Đăng H+ MP Poll', 'Khánh']
         }))
         
         res.status(200).json(formattedExpenses)
@@ -35,7 +36,7 @@ export default async function handler(req, res) {
       }
 
       case 'POST': {
-        const { person, description, amount } = req.body
+        const { person, description, amount, splitAmong } = req.body
 
         if (!person || !description || !amount) {
           return res.status(400).json({ error: 'Thiếu thông tin bắt buộc' })
@@ -46,7 +47,8 @@ export default async function handler(req, res) {
           .insert([{
             person: person.trim(),
             description: description.trim(),
-            amount: parseFloat(amount)
+            amount: parseFloat(amount),
+            split_among: splitAmong || ['Trần Vương', 'Hào bé  o', 'Đăng H+ MP Poll', 'Khánh']
           }])
           .select()
 
@@ -58,7 +60,8 @@ export default async function handler(req, res) {
           person: newExpense[0].person,
           description: newExpense[0].description,
           amount: parseFloat(newExpense[0].amount),
-          date: new Date(newExpense[0].created_at).toLocaleDateString('vi-VN')
+          date: new Date(newExpense[0].created_at).toLocaleDateString('vi-VN'),
+          splitAmong: newExpense[0].split_among
         }
         
         res.status(201).json(formatted)

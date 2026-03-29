@@ -7,7 +7,8 @@ CREATE TABLE public.expenses (
   id BIGSERIAL PRIMARY KEY,
   person VARCHAR(100) NOT NULL,
   description TEXT NOT NULL,
-  amount DECIMAL(10,2) NOT NULL,
+  amount DECIMAL(15,2) NOT NULL,
+  split_among TEXT[] DEFAULT ARRAY['Trần Vương', 'Hào bé  o', 'Đăng H+ MP Poll', 'Khánh'],
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

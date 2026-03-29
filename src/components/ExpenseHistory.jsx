@@ -40,6 +40,9 @@ const ExpenseHistory = ({ expenses, onDeleteExpense }) => {
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">
                     Mô tả
                   </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">
+                    Chia cho
+                  </th>
                   <th className="px-4 py-3 text-right text-sm font-medium text-gray-700 border-b">
                     Số tiền
                   </th>
@@ -62,6 +65,15 @@ const ExpenseHistory = ({ expenses, onDeleteExpense }) => {
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700 border-b">
                       {expense.description}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600 border-b">
+                      <div className="flex flex-wrap gap-1">
+                        {(expense.splitAmong || expense.split_among || []).map(p => (
+                          <span key={p} className="inline-block px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
+                            {p}
+                          </span>
+                        ))}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-sm font-bold text-green-600 text-right border-b">
                       {formatCurrency(expense.amount)}
@@ -112,7 +124,14 @@ const ExpenseHistory = ({ expenses, onDeleteExpense }) => {
                     </svg>
                   </button>
                 </div>
-                <div className="text-sm text-gray-700 mb-2">{expense.description}</div>
+                <div className="text-sm text-gray-700 mb-1">{expense.description}</div>
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {(expense.splitAmong || expense.split_among || []).map(p => (
+                    <span key={p} className="inline-block px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
+                      {p}
+                    </span>
+                  ))}
+                </div>
                 <div className="text-lg font-bold text-green-600">
                   {formatCurrency(expense.amount)}
                 </div>
